@@ -1,0 +1,137 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
+using CMS.PortalControls;
+using CMS.DataEngine;
+using System.Data;
+using System.Xml;
+using CMS.SettingsProvider;
+using CMS.SiteProvider;
+using System.Configuration;
+using System.Data.SqlClient;
+using CMS.GlobalHelper;
+using Rigel.Email;
+using CMS.EmailEngine;
+using CMS.CMSHelper;
+using CMS.EventLog;
+using CMS.MacroEngine;
+using System.Reflection;
+using System.Xml.Linq;
+using System.Xml.Serialization;
+using System.IO;
+
+public partial class CMSWebParts_FoneHouse_AffiliateDecisionTech : CMSAbstractWebPart
+{
+    //int HandsetId = QueryHelper.GetInteger("handsetid", 0);
+    //string HandsetName = QueryHelper.GetString("handsetid", "");
+
+    public static string responsePhone = "";
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        string str = string.Empty;
+        GeneralConnection cn = ConnectionHelper.GetConnection();
+        DataSet ds = new DataSet();
+        ds = cn.ExecuteQuery("customtable.handset_master.decisiontechxml");
+        DataTable dt = new DataTable("product");
+        dt = ds.Tables[0];
+        EventLogProvider.LogInformation("XMLcount" + dt.Rows.Count, "TextXML");
+        XElement contacts = new XElement("Merchant");
+        var list = new List<XElement>();
+        foreach (DataRow dr in dt.Rows)
+        {   
+            EventLogProvider.LogInformation("datarowXML" + dr["pid"].ToString(), "");
+            contacts =
+            new XElement("Merchant",
+                new XElement("Product",
+                    new XElement("Category", dr["Category"].ToString()),
+                    new XElement("pid", dr["pid"].ToString()),
+                    new XElement("merchant_image", dr["merchant_image"].ToString()),
+                    new XElement("name", dr["name"].ToString()),
+                    new XElement("colour", dr["colour"].ToString()),
+                    new XElement("promotext", dr["promotext"].ToString()),
+                    new XElement("desc", dr["desc"].ToString()),
+                    new XElement("Keywords", dr["Keywords"].ToString()),
+                    new XElement("purl", dr["purl"].ToString()),
+                    new XElement("imgurl", dr["imgurl"].ToString()),
+                    new XElement("thumburl", dr["thumburl"].ToString()),
+                    new XElement("spec", dr["spec"].ToString()),
+                    new XElement("brand", dr["brand"].ToString()),
+                    new XElement("condition", dr["condition"].ToString()),
+                    new XElement("Price",
+                            new XElement("Actualp", dr["Actualp"].ToString())
+                        ),
+                    new XElement("currency", dr["currency"].ToString()),
+                    new XElement("delcost", dr["delcost"].ToString()),
+                    new XElement("deltime", dr["deltime"].ToString()),
+                    new XElement("delivery_restrictions", dr["delivery_restrictions"].ToString()),
+                    new XElement("warranty", dr["warranty"].ToString()),
+                    new XElement("cg", dr["cg"].ToString()),
+                    new XElement("weboffer", dr["weboffer"].ToString()),
+                    new XElement("decisiontech",
+                        new XElement("gift", dr["gift"].ToString()),
+                        new XElement("auto_cashback", dr["auto_cashback"].ToString()),
+                        new XElement("redemption_cashback", dr["redemption_cashback"].ToString()),
+                        new XElement("contract_type", dr["contract_type"].ToString()),
+                        new XElement("tarriff", dr["tarriff"].ToString()),
+                        new XElement("inc_minutes", dr["inc_minutes"].ToString()),
+                        new XElement("inc_data", dr["inc_data"].ToString()),
+                        new XElement("initial_cost", dr["inital_cost"].ToString()),
+                        new XElement("month_cost", dr["month_cost"].ToString()),
+                        new XElement("term", dr["term"].ToString()),
+                        new XElement("network", dr["network"].ToString()),
+                        new XElement("merchant_category", dr["merchant_category"].ToString()),
+                        new XElement("Product_Colour", dr["Product_Colour"].ToString())
+                    )
+
+             )
+
+         );
+            list.Add(new XElement(contacts));
+        }
+        string output = @"D:\inetpub\wwwroot\FonehouseKenticoLiveCMS82\CMS\AffiliateFeed\ExportedFeed\AffiliateDecisionTech.xml";
+        XmlSerializer serialiser = new XmlSerializer(typeof(List<XElement>));
+        TextWriter FileStream = new StreamWriter(output);
+        serialiser.Serialize(FileStream, list);
+        FileStream.Close();
+
+        Response.Buffer = true;
+        Response.Charset = "";
+        Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        //Response.ContentType = "application/xml";
+        //Response.WriteFile(Server.MapPath("~/AffiliateFeed/ExportedFeed/AffiliateDecisionTech.xml"));
+        //Response.AppendHeader("Content-Disposition", "attachment; filename=AffiliateDecisionTech.xml");
+        Response.TransmitFile(Server.MapPath("~/AffiliateFeed/ExportedFeed/AffiliateDecisionTech.xml"));
+        //Response.Flush();
+        Response.End();
+        Response.Clear();
+
+
+        //GeneralConnection cn = ConnectionHelper.GetConnection();
+        //DataSet ds = new DataSet();
+        //ds = cn.ExecuteQuery("customtable.handset_master.decisiontechxml");
+        //string fileurl = @"d:\inetpub\wwwroot\fonehouseKenticoLiveCopyCMS82\cms\affiliatefeed\exportedfeed\affiliatedecisiontech.xml";
+        //DataTable dt = new DataTable("product");
+        //dt = ds.Tables[0];
+
+
+        //ds.WriteXml(fileurl);
+
+
+        //Response.Buffer = true;
+        //Response.Charset = "";
+        //Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        //Response.ContentType = "application/xml";
+        ////Response.WriteFile(Server.MapPath("~/AffiliateFeed/ExportedFeed/AffiliateDecisionTech.xml"));
+        //Response.AppendHeader("Content-Disposition", "attachment; filename=AffiliateDecisionTech.xml");
+        //Response.TransmitFile(Server.MapPath("~/AffiliateFeed/ExportedFeed/AffiliateDecisionTech.xml"));
+        ////Response.Flush();
+        //Response.End();
+        //Response.Clear();
+
+    }
+}
